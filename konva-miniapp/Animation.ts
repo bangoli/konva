@@ -1,6 +1,7 @@
 import { glob } from './Global';
 import { Layer } from './Layer';
 import { IFrame, AnimationFn } from './types';
+import { getCanvas, platForm } from './Platform';
 
 var now = (function(): () => number {
   if (glob.performance && glob.performance.now) {
@@ -242,7 +243,11 @@ export class Animation {
     var Anim = Animation;
     if (Anim.animations.length) {
       Anim._runFrames();
-      requestAnimationFrame(Anim._animationLoop);
+      if (platForm.isWx) {
+        getCanvas().requestAnimationFrame(Anim._animationLoop);
+      } else {
+        requestAnimationFrame(Anim._animationLoop);
+      }
     } else {
       Anim.animRunning = false;
     }
@@ -250,7 +255,11 @@ export class Animation {
   static _handleAnimation() {
     if (!this.animRunning) {
       this.animRunning = true;
-      requestAnimationFrame(this._animationLoop);
+      if (platForm.isWx) {
+        getCanvas().requestAnimationFrame(this._animationLoop);
+      } else {
+        requestAnimationFrame(this._animationLoop);
+      }
     }
   }
 }

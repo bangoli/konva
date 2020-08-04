@@ -3,12 +3,16 @@ import { SceneContext, HitContext, Context } from './Context';
 import { Konva } from './Global';
 import { Factory } from './Factory';
 import { getNumberValidator } from './Validators';
+import { k_systemInfo } from './Platform';
 
 // calculate pixel ratio
 var _pixelRatio;
 function getDevicePixelRatio() {
   if (_pixelRatio) {
     return _pixelRatio;
+  }
+  if (k_systemInfo && k_systemInfo.pixelRatio) {
+    return k_systemInfo.pixelRatio;
   }
   var canvas = Util.createCanvasElement();
   var context = canvas.getContext('2d') as any;

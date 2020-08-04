@@ -20,9 +20,11 @@ var EMPTY_STRING = '',
   NORMAL = 'normal';
 
 function _fillFunc(context) {
+  console.log('--textpath: ', this._partialText);
   context.fillText(this.partialText, 0, 0);
 }
 function _strokeFunc(context) {
+  console.log('--textpath1 : ', this._partialText);
   context.strokeText(this.partialText, 0, 0);
 }
 
@@ -202,7 +204,7 @@ export class TextPath extends Shape<TextPathConfig> {
 
   _getTextSize(text) {
     var dummyCanvas = this.dummyCanvas;
-    var _context = dummyCanvas.getContext('2d');
+    var _context = Util.createDummyContext ? Util.createDummyContext() : dummyCanvas.getContext('2d');
 
     _context.save();
 

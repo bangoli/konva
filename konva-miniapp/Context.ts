@@ -2,6 +2,7 @@ import { Util } from './Util';
 import { Konva } from './Global';
 import { Canvas } from './Canvas';
 import { Shape } from './Shape';
+import { platForm, getCanvas } from './Platform';
 
 var COMMA = ',',
   OPEN_PAREN = '(',
@@ -97,7 +98,7 @@ export class Context {
 
   constructor(canvas: Canvas) {
     this.canvas = canvas;
-    this._context = canvas._canvas.getContext('2d') as CanvasRenderingContext2D;
+    this._context = canvas._canvas.getContext('2d') as CanvasRenderingContext2D; // wx.createCanvasContext('myCanvas');
 
     if (Konva.enableTrace) {
       this.traceArr = [];
@@ -269,6 +270,7 @@ export class Context {
 
   setAttr(attr, val) {
     this._context[attr] = val;
+    // console.log("-setAttr:", attr, val);
   }
 
   /**
@@ -403,6 +405,7 @@ export class Context {
    * @name Konva.Context#fill
    */
   fill() {
+    console.log('---context fill: ');
     this._context.fill();
   }
   /**
@@ -411,6 +414,7 @@ export class Context {
    * @name Konva.Context#fillRect
    */
   fillRect(x, y, width, height) {
+    console.log('--context fillRect: ');
     this._context.fillRect(x, y, width, height);
   }
   /**
@@ -419,6 +423,7 @@ export class Context {
    * @name Konva.Context#strokeRect
    */
   strokeRect(x, y, width, height) {
+    console.log('--context strokeRect: ');
     this._context.strokeRect(x, y, width, height);
   }
   /**
@@ -427,6 +432,7 @@ export class Context {
    * @name Konva.Context#fillText
    */
   fillText(a0, a1, a2) {
+    console.log('----context fillText: ', a0, a1, a2);
     this._context.fillText(a0, a1, a2);
   }
   /**
@@ -435,6 +441,7 @@ export class Context {
    * @name Konva.Context#measureText
    */
   measureText(text) {
+    console.log('----context measureText: ');
     return this._context.measureText(text);
   }
   /**
@@ -804,7 +811,6 @@ export class SceneContext extends Context {
       ratio = this.canvas.getPixelRatio(),
       scaleX = scale.x * ratio,
       scaleY = scale.y * ratio;
-
     this.setAttr('shadowColor', color);
     this.setAttr(
       'shadowBlur',
@@ -812,13 +818,18 @@ export class SceneContext extends Context {
     );
     this.setAttr('shadowOffsetX', offset.x * scaleX);
     this.setAttr('shadowOffsetY', offset.y * scaleY);
+    // console.log('-- _applyShadow', color, offset.x * scaleX, offset.y * scaleY, blur * Math.min(Math.abs(scaleX), Math.abs(scaleY));
   }
 }
 
 export class HitContext extends Context {
   _fill(shape) {
     this.save();
-    this.setAttr('fillStyle', shape.colorKey);
+    if (platForm.isWx) {
+      this.setAttr('fillStyle', shape.fill());
+    } else {
+      this.setAttr('fillStyle', shape.colorKey);
+    }
     shape._fillFuncHit(this);
     this.restore();
   }
@@ -843,7 +854,12 @@ export class HitContext extends Context {
         hitStrokeWidth === 'auto' ? shape.strokeWidth() : hitStrokeWidth;
 
       this.setAttr('lineWidth', strokeWidth);
-      this.setAttr('strokeStyle', shape.colorKey);
+      if (platForm.isWx) {
+        this.setAttr('strokeStyle', shape.stroke());
+      } else {
+        this.setAttr('strokeStyle', shape.colorKey);
+      }
+      this.save();
       shape._strokeFuncHit(this);
       if (!strokeScaleEnabled) {
         this.restore();

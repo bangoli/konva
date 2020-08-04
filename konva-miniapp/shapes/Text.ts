@@ -85,14 +85,16 @@ function getDummyContext() {
   if (dummyContext) {
     return dummyContext;
   }
-  dummyContext = Util.createCanvasElement().getContext(CONTEXT_2D);
+  dummyContext = Util.createDummyContext ? Util.createDummyContext() : Util.createCanvasElement().getContext(CONTEXT_2D);
   return dummyContext;
 }
 
 function _fillFunc(context) {
+  console.log('--text2: ', this._partialText);
   context.fillText(this._partialText, this._partialTextX, this._partialTextY);
 }
 function _strokeFunc(context) {
+  console.log('--text1: ', this._partialText);
   context.strokeText(this._partialText, this._partialTextX, this._partialTextY);
 }
 

@@ -86,7 +86,7 @@ function getDummyContext(): CanvasRenderingContext2D {
   if (dummyContext) {
     return dummyContext;
   }
-  dummyContext = Util.createCanvasElement().getContext('2d');
+  dummyContext = Util.createDummyContext ? Util.createDummyContext() : Util.createCanvasElement().getContext('2d');
   return dummyContext;
 }
 
@@ -105,6 +105,9 @@ function _strokeFunc(context) {
   context.stroke();
 }
 function _fillFuncHit(context) {
+  // context._context.fillStyle = 'red';
+  // console.log('---fill:', context, context._context.fillStyle)
+  // console.log('---fill-:', context._context.shadowColor, context._context.shadowBlur)
   context.fill();
 }
 function _strokeFuncHit(context) {
@@ -563,7 +566,7 @@ export class Shape<Config extends ShapeConfig = ShapeConfig> extends Node<
     var caching = canvas.isCache;
     var skipBuffer = canvas.isCache;
     var cachingSelf = top === this;
-
+    // console.log('---hasShadow:', hasShadow)
     if (!this.isVisible() && !caching) {
       return this;
     }

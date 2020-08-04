@@ -1,6 +1,8 @@
 import { glob, Konva } from './Global';
 import { Node } from './Node';
 import { IRect, RGB, RGBA, Vector2d } from './types';
+import { k_document as document, getCanvas, platForm } from './Platform';
+
 
 /**
  * Collection constructor. Collection extends Array.
@@ -609,17 +611,22 @@ export const Util = {
   requestAnimFrame(callback: Function) {
     animQueue.push(callback);
     if (animQueue.length === 1) {
-      requestAnimationFrame(function () {
+      var func = function () {
         const queue = animQueue;
         animQueue = [];
         queue.forEach(function (cb) {
           cb();
         });
-      });
+      }
+      if (platForm.isWx) {
+        getCanvas().requestAnimationFrame(func)
+      } else {
+        requestAnimationFrame(func);
+      }
     }
   },
   createCanvasElement() {
-    var canvas = document.createElement('canvas');
+    var canvas = getCanvas() || document.createElement('canvas');
     // on some environments canvas.style is readonly
     try {
       (<any>canvas).style = canvas.style || {};
@@ -627,6 +634,7 @@ export const Util = {
     return canvas;
   },
   createImageElement() {
+    console.log('-createElement-2222-');
     return document.createElement('img');
   },
   _isInDocument(el: any) {
